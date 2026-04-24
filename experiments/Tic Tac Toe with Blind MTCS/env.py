@@ -26,7 +26,7 @@ class Board:
         for i in range(3):
             for j in range(3):
                 if self.state[i][j] == 0:
-                    self.action.append([i, j])
+                    self.action.append((i, j))
         return self.action
 
     def check_terminal(self):
