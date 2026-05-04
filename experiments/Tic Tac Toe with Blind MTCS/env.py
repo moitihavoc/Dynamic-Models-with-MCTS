@@ -22,6 +22,9 @@ class Board:
         # alternate between players' turns
         self.player = 1 if self.player == 2 else 2
 
+    def play_turn(self, action:tuple):
+        self.state[action[0]][action[1]] = self.player
+
     def check_avail_actions(self):
         # check available actions by checking which cell is 0
         self.action = [] 

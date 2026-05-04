@@ -46,12 +46,12 @@ class TreeNode:
         exploration = c * math.sqrt(math.log2(self.visit_count)/child.visit_count) 
         return exploitation + exploration
 
-    def select_best_action(self):
+    def select_best_action(self, policy):
         """
         select child with best pUCT
         if a child's visit count = 0, the puct can prioritize exploring that child thanks to the exploration term
         """
-        return max(self.children.keys(), key=lambda a: self.pUCT(a))
+        return max(self.children.keys(), key=lambda a: self.pUCT(a, policy))
 
     def backpropagate(self, search_path: list, value: float):
         """
@@ -67,34 +67,36 @@ def mcts_search(root_state: tuple, world_model: wm.LearnedWorldModel, available_
     root = TreeNode(root_state)
 
     # we get the available actions from the environment.
-    for a in all_actions:
+    for a in available_actions:
         root.children[a] = TreeNode(None, parent=root)
+        
 
     for _ in range(iterations):
         node = root
         search_path = [node]
         value: float
+        policy = 1/len(available_actions)
+
 
         while node.children:
-            action = node.select_best_action()
-            next_state, reward = world_model.predict(node.state, action)
+            action = node.select_best_action(policy)
+            next_state, reward = world_model.dynamics(node.state, action)
+            predicted_value = world_model.predict(next_state, action)
 
             if next_state is None:
-                value = 0
+                value = predicted_value
                 break
-            if action not in node.children:
-                node.children[action] = TreeNode(next_state, parent=node)
 
             node = node.children[action]
             search_path.append(node)
 
             if reward != 0:
-                value = reward
+                value = reward + predicted_value
                 break
-        else: value = 0.5
+        else: value = 0
 
         if not node.children:
-            node.expand()
+            node.expand(available_actions)
         
         node.backpropagate(search_path, value)
     

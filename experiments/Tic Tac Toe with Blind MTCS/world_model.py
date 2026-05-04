@@ -14,7 +14,7 @@ class LearnedWorldModel:
         return rep_state
         
 
-    def dynamics(self, latent_state: tuple, action: tuple, is_done: bool) -> tuple:
+    def dynamics(self, latent_state: tuple, action: tuple) -> tuple:
          """
          query the dictionary for the input state and action
          if there is none, return none, the reward will 0 to be neutral
@@ -27,7 +27,7 @@ class LearnedWorldModel:
 
          if(result is None): return (None, 0)
 
-         return (result, reward, is_done)
+         return (result, reward)
     
     def update_dynamics(self, latent_state: tuple, action: tuple, next_state: tuple, reward: float):
         """
