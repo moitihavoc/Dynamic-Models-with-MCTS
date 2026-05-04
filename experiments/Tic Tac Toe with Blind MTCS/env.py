@@ -1,3 +1,4 @@
+import random
 class Board:
     def __init__(self):
         # player: the machine will play as 2, human player will play 1
@@ -15,6 +16,7 @@ class Board:
     def first_to_play(self):
         # randomly determine which player goes first
         self.player = random.choice([1,2])
+        return self.player
 
     def alternate_turn(self):
         # alternate between players' turns
