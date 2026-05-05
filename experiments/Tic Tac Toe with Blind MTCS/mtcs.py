@@ -13,7 +13,7 @@ class TreeNode:
         self.children: dict[tuple] = {}
         self.visit_count = 0
         self.treesearch_value = 0
-        self.state_map: dict[tuple] # use the transition dictionary here
+        self.state_map: dict[tuple] = wm.LearnedWorldModel().transitions# use the transition dictionary here
 
     def expand(self, available_actions: list[tuple]):
         """
@@ -29,7 +29,7 @@ class TreeNode:
                     self.children[action] = TreeNode(None)
                 else: self.children[action] = TreeNode(self.state_map.get((self.state, action)))
 
-    def pUCT(self, child, policy):
+    def pUCT(self, child_action):
         """
         calculate the pUCT value of an action in a given state
         since i dont have a NN for prediction yet, the prior value will be 1/number of children
@@ -41,19 +41,20 @@ class TreeNode:
         the tree search value is the sum of predicted value + dynamic reward
         """
         c = 1.41 
+        child = self.children[child_action]
         if child.visit_count == 0: return float('inf')
-        exploitation = self.treesearch_value/self.visit_count
-        exploration = c * math.sqrt(math.log2(self.visit_count)/child.visit_count) 
+        exploitation = child.treesearch_value/child.visit_count
+        exploration =  c * (math.sqrt(self.visit_count)/(1 + child.visit_count)) 
         return exploitation + exploration
 
-    def select_best_action(self, policy):
+    def select_best_action(self):
         """
         select child with best pUCT
         if a child's visit count = 0, the puct can prioritize exploring that child thanks to the exploration term
         """
-        return max(self.children.keys(), key=lambda a: self.pUCT(a, policy))
+        return max(self.children.keys(), key=lambda a: self.pUCT(a))
 
-    def backpropagate(self, search_path: list, value: float):
+    def backpropagate(self, search_path: list["TreeNode"], value: float):
         """
         update the tree search value and the visit count until reaching the root node
         """
@@ -67,37 +68,33 @@ def mcts_search(root_state: tuple, world_model: wm.LearnedWorldModel, available_
     root = TreeNode(root_state)
 
     # we get the available actions from the environment.
-    for a in available_actions:
-        root.children[a] = TreeNode(None, parent=root)
-        
+    root.expand(available_actions)
 
     for _ in range(iterations):
         node = root
         search_path = [node]
         value: float
-        policy = 1/len(available_actions)
 
 
         while node.children:
-            action = node.select_best_action(policy)
+            action = node.select_best_action()
             next_state, reward = world_model.dynamics(node.state, action)
-            predicted_value = world_model.predict(next_state, action)
 
-            if next_state is None:
-                value = predicted_value
+            if next_state is not None:
+                value = reward
                 break
 
             node = node.children[action]
             search_path.append(node)
 
             if reward != 0:
-                value = reward + predicted_value
                 break
         else: value = 0
 
         if not node.children:
             node.expand(available_actions)
         
+        
         node.backpropagate(search_path, value)
     
-    return max(root.children, key=lambda a: root.children[a].visit_count)
+    return max(root.children.keys(), key=lambda a: root.children[a].visit_count, default=available_actions[0] if available_actions else None)

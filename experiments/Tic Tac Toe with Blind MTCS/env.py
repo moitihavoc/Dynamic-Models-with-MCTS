@@ -36,7 +36,7 @@ class Board:
 
     def check_terminal(self):
         # check for terminal state by checking number of available actions
-        if len(self.action) == 0:
+        if len(self.action) == 0 or self.check_winner_state() is not None:
             return True
         else:
             return False

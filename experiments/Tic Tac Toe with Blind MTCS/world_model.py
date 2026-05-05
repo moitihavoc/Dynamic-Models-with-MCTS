@@ -37,16 +37,16 @@ class LearnedWorldModel:
         self.transitions[(latent_state, action)] = next_state
         self.outcomes[(latent_state, action)] = reward
 
-    def predict(self, latent_state: tuple, action: tuple) -> float:
-        """predicts the reward for the future; 1 step ahead in this case
-        if the next state is none, return 2 to encourage exploration
-        if not, return the reward in the lookup table 
+    # def predict(self, latent_state: tuple, action: tuple) -> float:
+    #     """predicts the reward for the future; 1 step ahead in this case
+    #     if the next state is none, return 2 to encourage exploration
+    #     if not, return the reward in the lookup table 
 
-        predict the positive rewards for the unknown state here for the simulation: 2 for unknonw, 1 for win, 0 for rest
-        also supposedly generate a policy value, but for tic tac toe, the policy is likely uniform for unknown child states and therefore not significant
-        I decided to remove it
-        """
-        next_state = self.transitions.get(latent_state, action)
-        if (next_state is None): return 2
+    #     predict the positive rewards for the unknown state here for the simulation: 2 for unknonw, 1 for win, 0 for rest
+    #     also supposedly generate a policy value, but for tic tac toe, the policy is likely uniform for unknown child states and therefore not significant
+    #     I decided to remove it
+    #     """
+    #     next_state = self.transitions.get(latent_state, action)
+    #     if (next_state is None): return 2
 
-        return self.outcomes.get(latent_state, action)
+    #     return self.outcomes.get(latent_state, action)
