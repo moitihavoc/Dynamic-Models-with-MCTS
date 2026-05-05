@@ -27,7 +27,8 @@ def train():
                     reward = -1.0
                 elif winner is None:
                     reward = 0.5
-                reward = 1.0
+                else:
+                    reward = 1.0
             
             model.update_dynamics(root_state, chosen_action, next_state, reward)
             
