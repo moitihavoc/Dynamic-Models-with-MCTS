@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 class LearnedWorldModel:
     def __init__(self):
@@ -50,3 +51,11 @@ class LearnedWorldModel:
     #     if (next_state is None): return 2
 
     #     return self.outcomes.get(latent_state, action)
+
+    # saves the model to a binary pickle file.
+    def save(self, path: str = "model.pkl"):
+        with open(path, "wb") as f:
+            pickle.dump({
+                "transitions": self.transitions,
+                "outcomes":    self.outcomes,
+            }, f)
