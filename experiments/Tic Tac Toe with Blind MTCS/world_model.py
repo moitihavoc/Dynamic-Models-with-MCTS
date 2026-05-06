@@ -59,3 +59,24 @@ class LearnedWorldModel:
                 "transitions": self.transitions,
                 "outcomes":    self.outcomes,
             }, f)
+        return {
+            "path": path,
+            "transitions": len(self.transitions),
+            "outcomes": len(self.outcomes)
+        }
+
+    # loads the model from a pickle file saved by save()
+    def load(self, path: str = "model.pkl"):
+        try:
+            open(path).close() # check if the file exists before loading
+        except FileNotFoundError:
+            raise FileNotFoundError() # no model found
+        with open(path, "rb") as f:
+            data = pickle.load(f)
+        self.transitions.update(data["transitions"])
+        self.outcomes.update(data["outcomes"])
+        return {
+            "path": path,
+            "transitions": len(self.transitions),
+            "outcomes": len(self.outcomes),
+        }
