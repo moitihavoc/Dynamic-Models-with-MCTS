@@ -53,7 +53,7 @@ class LearnedWorldModel:
     #     return self.outcomes.get(latent_state, action)
 
     # saves the model to a binary pickle file.
-    def save(self, path: str = "model.pkl"):
+    def save(self, path: str = "/home/moiti/Personal_Projects/PycharmProjects/Dynamic_Models/Dynamic-Models-with-MCTS/experiments/Tic Tac Toe with Blind MTCS/model.pkl"):
         with open(path, "wb") as f:
             pickle.dump({
                 "transitions": self.transitions,
@@ -66,17 +66,28 @@ class LearnedWorldModel:
         }
 
     # loads the model from a pickle file saved by save()
-    def load(self, path: str = "model.pkl"):
+    # def load(self, path: str = "model.pkl"):
+    #     try:
+    #         open(path).close() # check if the file exists before loading
+    #     except FileNotFoundError:
+    #         print("No existing model found, continue") # no model found
+    #     with open(path, "rb") as f:
+    #         data = pickle.load(f)
+    #     self.transitions.update(data["transitions"])
+    #     self.outcomes.update(data["outcomes"])
+    #     return {
+    #         "path": path,
+    #         "transitions": len(self.transitions),
+    #         "outcomes": len(self.outcomes),
+    #     }
+
+    def load(self, path: str = "/home/moiti/Personal_Projects/PycharmProjects/Dynamic_Models/Dynamic-Models-with-MCTS/experiments/Tic Tac Toe with Blind MTCS/model.pkl"):
         try:
-            open(path).close() # check if the file exists before loading
+            with open(path, "rb") as f:
+                data = pickle.load(f)
+            self.transitions.update(data["transitions"])
+            self.outcomes.update(data["outcomes"])
+            print(f"Model loaded from {path}")
         except FileNotFoundError:
-            raise FileNotFoundError() # no model found
-        with open(path, "rb") as f:
-            data = pickle.load(f)
-        self.transitions.update(data["transitions"])
-        self.outcomes.update(data["outcomes"])
-        return {
-            "path": path,
-            "transitions": len(self.transitions),
-            "outcomes": len(self.outcomes),
-        }
+            # Instead of crashing, we allow the agent to start with empty dictionaries
+            print(f"No existing model found at {path}. Starting fresh.")
