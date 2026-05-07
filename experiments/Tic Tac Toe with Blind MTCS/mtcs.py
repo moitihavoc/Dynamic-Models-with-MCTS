@@ -3,7 +3,7 @@ import math
 # perform mcts based on what is in the dictionary
 
 class TreeNode:
-    def __init__(self, latent_state: tuple, parent: tuple = None):
+    def __init__(self, latent_state: tuple, parent: tuple = None, transitions: dict = None):
         """
         use the latent state from the dictionary
         the children nodes is contained in another dictionary that map available action to latent states
@@ -13,7 +13,9 @@ class TreeNode:
         self.children: dict[tuple] = {}
         self.visit_count = 0
         self.treesearch_value = 0
-        self.state_map: dict[tuple] = wm.LearnedWorldModel().transitions# use the transition dictionary here
+
+        # transitions dict that is shared across all nodes (current knowledge)
+        self.state_map: dict = transitions if transitions is not None else {}
 
     def expand(self, available_actions: list[tuple]):
         """
