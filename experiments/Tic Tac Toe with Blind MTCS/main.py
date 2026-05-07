@@ -30,7 +30,9 @@ def train():
                 reward = 1.0
             
             model.update_dynamics(root_state, chosen_action, next_state, reward)
+            # model.save()
             
+# add a play function, uses model.load() before playing
 
 
 
